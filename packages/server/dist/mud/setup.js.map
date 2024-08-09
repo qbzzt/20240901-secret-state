@@ -1,1 +1,0 @@
-{"version":3,"file":"setup.js","sourceRoot":"","sources":["../../src/mud/setup.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,mBAAmB,CAAC;AAIjD,MAAM,CAAC,KAAK,UAAU,KAAK;IACvB,MAAM,OAAO,GAAG,MAAM,YAAY,EAAE,CAAC;IACzC,iEAAiE;IAE7D,OAAO;QACL,OAAO;QACb,oBAAoB;KACf,CAAC;AACJ,CAAC"}
