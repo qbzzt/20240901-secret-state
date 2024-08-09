@@ -1,0 +1,30 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "tsc --noEmit",
+    "start": "tsc && node dist/app.js"
+  },
+  "dependencies": {
+    "@latticexyz/common": "2.0.12",
+    "@latticexyz/dev-tools": "2.0.12",
+    "@latticexyz/recs": "^2.0.12",
+    "@latticexyz/schema-type": "2.0.12",
+    "@latticexyz/store-sync": "2.0.12",
+    "@latticexyz/utils": "2.0.12",
+    "@latticexyz/world": "2.0.12",
+    "dotenv": "^16.4.5",
+    "rxjs": "7.5.5",
+    "viem": "2.9.20",
+    "zokrates-js": "^1.1.9"
+  },
+  "devDependencies": {
+    "@types/node": "^22.1.0",
+    "@types/react-dom": "18.2.7",
+    "vite": "^4.2.1",
+    "wait-port": "^1.0.4"
+  }
+}

@@ -1,0 +1,1 @@
+../../../contracts/mud.config.ts
