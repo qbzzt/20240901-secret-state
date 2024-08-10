@@ -46,20 +46,21 @@ const MapCell = attrs => {
   const hover = useHover(digHereHover, digHere)
   
   return (
-    <button disabled={attrs.GameMap!==undefined}
+    <button disabled={attrs.GameMap!==undefined || !attrs.active}
       onMouseEnter={hover.onMouseEnter}
       onMouseLeave={hover.onMouseLeave}
       style={attrs.GameMap===undefined ? hover.style : dugAlready}
       onClick={() => {
         attrs.dig(attrs.x, attrs.y)
-      }}    >
+      }}
+    >
       {
         attrs.GameMap===undefined ? "?" : 
         attrs.GameMap===254 ? "💣" : 
         attrs.GameMap.toString()
       }
     </button>
-  )
+  ) 
 }
 
 const Map = attrs => {
@@ -69,7 +70,13 @@ const Map = attrs => {
         <tr key={`tr_${y}`}>
           {attrs.columns.map((column, x) => (
             <td key={`td_${x}_${y}`}>
-              <MapCell x={x} y={y} GameMap={attrs.gameMap[`${x},${y}`]} dig={attrs.dig} />
+              <MapCell
+                active={attrs.active} 
+                x={x} 
+                y={y}
+                GameMap={attrs.gameMap[`${x},${y}`]} 
+                dig={attrs.dig} 
+              />
             </td>
             )
           )}
@@ -102,6 +109,13 @@ const EndGame = (attrs) => {
         (<h4>You won!</h4>) 
         : (<h4>You lost</h4>)
       }
+      <Map 
+        lines={attrs.lines} 
+        columns={attrs.columns} 
+        gameMap={attrs.gameMap} 
+        active={false}
+      />
+      <br />      
       <button
         style={controlButton}
         onClick={() => attrs.reset()}
@@ -160,8 +174,20 @@ export const App = () => {
       Digs left: {digsLeft} <br />
       { gameRecord && gameRecord?.gameId != 0 ? 
           gameRecord.win || gameRecord.lose ?
-            ( <EndGame reset={reset} win={gameRecord.win} /> ) 
-            : ( <Map lines={lines} columns={columns} gameMap={gameMap} dig={dig} /> )
+            ( <EndGame 
+                reset={reset} 
+                win={gameRecord.win} 
+                lines={lines}
+                columns={columns}
+                gameMap={gameMap}
+              /> ) 
+              : ( <Map 
+                    lines={lines} 
+                    columns={columns} 
+                    gameMap={gameMap} 
+                    dig={dig}
+                    active={true}
+                  /> )
         : ( <NewGame newGame={newGame} /> )
       }
 
