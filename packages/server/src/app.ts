@@ -40,9 +40,8 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
 
     const newGame = function() : string {
         const newGame: Game = createGame()
-        gamesInProgress[newGame.hash] = newGame
-    
-        return newGame.hash
+        gamesInProgress[newGame.hash.toString()] = newGame
+        return newGame.hash.toString()
     }
 
     const createGame = function() : Game
@@ -75,6 +74,7 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
         }
     }
 
+
     // Because of the way Zokrates works, we need to give the map empty borders
     const makeMapBorders = function(map: boolean[][]) : boolean[][] {
         let mapWithBorders = new Array(width+2)
@@ -106,18 +106,30 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
         const gameHash = newGame()
         const newGameAddress = '0x' + update.entity.slice(-40)
 
+        console.log(`New game ${gameHash} for ${newGameAddress}`)
+
         const tx = await mudSetup.network.worldContract.write.app__newGameResponse(
-            [newGameAddress, gameHash]);
+            [newGameAddress, gameHash])
+
         await mudSetup.network.waitForTransaction(tx);        
     })
 
     mudSetup.network.components.PendingDig.update$.subscribe(async (update) => {
-
-        console.log(`Dig in game ${update?.entity}`)
         
         // Only dig if requested
         if (!Object.values(update.value)[0]?.wantsDig)
             return
+
+        console.log(`Dig in game ${update?.entity} ` + 
+            `at (${Object.values(update.value)[0]?.x},${Object.values(update.value)[0]?.y})`)
+
+        if (!gamesInProgress[update?.entity]) {
+            console.log("ERROR: Trying a non-existent game")
+            console.log(`\tGame identity: ${update?.entity}`)
+            console.log(`\tGames in progress: ${Object.keys(gamesInProgress)}`)
+
+            return
+        }
 
         const digResult = zkDig(gamesInProgress[update?.entity].mapWithBorders, 
             Object.values(update.value)[0]?.x, Object.values(update.value)[0]?.y)
@@ -126,7 +138,8 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
 //        console.log(formattedResult)
 
         const tx = await mudSetup.network.worldContract.write.app__digResponse(
-          [update?.entity, digResult.inputs[0], digResult.inputs[1], digResult.inputs[10]]
+          [update?.entity, digResult.inputs[0], digResult.inputs[1], 
+            digResult.inputs[digResult.inputs.length-1]]
         );
         await mudSetup.network.waitForTransaction(tx);        
     })   

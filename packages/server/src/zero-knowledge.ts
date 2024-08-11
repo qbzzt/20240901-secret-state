@@ -5,10 +5,10 @@ export const zkFunctions = async (width: number, height: number) : Promise<any> 
     const zokrates = await zokratesInitialize()
 
     const hashFragment = `
-        from "hashes/pedersen/512bitBool.zok" import main as pederhash;
-        import "utils/casts/bool_256_to_u32_8.zok" as bool_256_to_u32_8;
+        import "utils/pack/bool/pack128.zok" as pack128;
+        import "hashes/poseidon/poseidon.zok" as poseidon;
         
-        def hashMap(bool[${width+2}][${height+2}] map) -> u32[8] {
+        def hashMap(bool[${width+2}][${height+2}] map) -> field {
             bool[512] mut map1d = [false; 512];
             u32 mut counter = 0;
 
@@ -19,14 +19,21 @@ export const zkFunctions = async (width: number, height: number) : Promise<any> 
               }
             }
 
-            return bool_256_to_u32_8(pederhash(map1d));
+            field[4] hashMe = [
+                pack128(map1d[0..128]),
+                pack128(map1d[128..256]),
+                pack128(map1d[256..384]),
+                pack128(map1d[384..512])
+            ];
+
+            return poseidon(hashMe);
         }
     `
 
     const hashProgram = `
         ${hashFragment}
 
-        def main(bool[${width+2}][${height+2}] map) -> u32[8] {
+        def main(bool[${width+2}][${height+2}] map) -> field {
             return hashMap(map);
         }
     `
@@ -39,7 +46,7 @@ export const zkFunctions = async (width: number, height: number) : Promise<any> 
             return if map[x+1][y+1] { 1 } else { 0 };
         }
 
-        def main(private bool[${width+2}][${height+2}] map, u32 x, u32 y) -> (u32[8], u8) {
+        def main(private bool[${width+2}][${height+2}] map, u32 x, u32 y) -> (field, u8) {
             return (hashMap(map) ,
                 if map2mineCount(map, x, y) > 0 { 0xFF } else {
                     map2mineCount(map, x-1, y-1) + map2mineCount(map, x, y-1) + map2mineCount(map, x+1, y-1) +
@@ -61,14 +68,10 @@ export const zkFunctions = async (width: number, height: number) : Promise<any> 
     const verifierKey = keySetupResults.vk
     const proverKey = keySetupResults.pk
 
-    const joinHashArray = function(arr: string[]): string {
-        return "0x"+arr.map(x => x.slice(2)).reduce((a,b) => a+b)
-    }
-
     const calculateMapHash = function(hashMe: boolean[][]): string {
-        return joinHashArray(JSON.parse(
-            zokrates.computeWitness(hashCompiled, [hashMe]).output)
-        )
+        return "0x" + 
+            BigInt(zokrates.computeWitness(hashCompiled, [hashMe]).output.slice(1,-1))
+            .toString(16).padEnd(64, "0")        
     }
 
     // Dig and return a zero knowledge proof of the result
