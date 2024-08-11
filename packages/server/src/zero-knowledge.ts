@@ -71,7 +71,7 @@ export const zkFunctions = async (width: number, height: number) : Promise<any> 
     const calculateMapHash = function(hashMe: boolean[][]): string {
         return "0x" + 
             BigInt(zokrates.computeWitness(hashCompiled, [hashMe]).output.slice(1,-1))
-            .toString(16).padEnd(64, "0")        
+            .toString(16).padStart(64, "0")        
     }
 
     // Dig and return a zero knowledge proof of the result
