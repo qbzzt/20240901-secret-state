@@ -18,4 +18,6 @@ interface IGameSystem {
   function app__digResponse(bytes32 gameId, uint8 x, uint8 y, uint8 bombs) external;
 
   function app__reset() external;
+
+  function app__setVerifier(address verifier) external;
 }

@@ -2,7 +2,15 @@
 pragma solidity >=0.8.24;
 
 import { System } from "@latticexyz/world/src/System.sol";
-import { PlayerGame, GamePlayer, Configuration, Map, PendingGame, PendingDig } from "../codegen/index.sol";
+import { 
+  PlayerGame, 
+  GamePlayer, 
+  Configuration, 
+  VerifierAddress, 
+  Map, 
+  PendingGame, 
+  PendingDig 
+} from "../codegen/index.sol";
 
 contract GameSystem is System {
   // Create a new game. For now, this game is "hardwired".
@@ -22,7 +30,6 @@ contract GameSystem is System {
     GamePlayer.set(gameHash, player);
     PendingGame.set(player, false);
   }
-
 
   function dig(uint8 x, uint8 y) public {
     require(y < Configuration.getHeight(), "y too high");
@@ -73,6 +80,10 @@ contract GameSystem is System {
     bytes32 gameId = PlayerGame.getGameId(_msgSender());
     require(gameId != 0, "no game to reset");
     PlayerGame.set(_msgSender(), bytes32(0), false, false, 0);
+  }
+
+  function setVerifier(address verifier) public {
+    VerifierAddress.set(verifier);
   }
 
 }

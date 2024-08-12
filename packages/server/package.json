@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "tsc --noEmit",
-    "start": "tsc && node dist/app.js"
+    "start": "tsc && node dist/app.js",
+    "init": "tsc && node dist/init.js"
   },
   "dependencies": {
     "@latticexyz/common": "2.0.12",

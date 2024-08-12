@@ -92,31 +92,15 @@ export const zkFunctions = async (width: number, height: number) : Promise<any> 
         return proof
     }
 
-    // Verify a dig's results (client-side code)
-    const verifyDig = function(hashOfMap: string, digResultProof: any) : any {
-        const hashInProof = "0x" + digResultProof.inputs.slice(2,-1)
-            .map((x: string) => x.slice(-8)).reduce((a: string, b: string) => a+b)
-        
-        // The proof used the wrong map
-        if (hashInProof != hashOfMap)
-            return false
+    const solidityVerifier = `
+        // Map size: ${width} x ${height}
+        \n${zokrates.exportSolidityVerifier(verifierKey)}
+        `
 
-        if (!zokrates.verify(verifierKey, digResultProof))
-            return false
-
-        return {
-            x: parseInt(digResultProof.inputs[0]),
-            y: parseInt(digResultProof.inputs[1]),
-            bombs: parseInt(digResultProof.inputs[digResultProof.inputs.length-1])
-        }
-    }
-
-    const solidityVerifier = zokrates.exportSolidityVerifier(verifierKey)    
     const formatProof = (proof: any) => zokrates.utils.formatProof(proof)
 
     return {
         zkDig,
-        verifyDig,
         calculateMapHash,
         solidityVerifier,
         formatProof

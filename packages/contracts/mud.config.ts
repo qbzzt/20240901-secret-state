@@ -11,6 +11,12 @@ export default defineWorld({
       },
       key: [],
     },
+    VerifierAddress: {
+      schema: {
+        verifier: "address"
+      },
+      key: [],
+    },
     PlayerGame: {
       schema: {
         player: "address",

@@ -1,5 +1,7 @@
 import { setup } from "./mud/setup.js"
 import { zkFunctions } from "./zero-knowledge.js"
+import { writeFileSync } from "node:fs"
+import { execSync } from "child_process"
 
 const mudSetup = await setup()
 
@@ -29,14 +31,28 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
         return ;
 
     console.log("Configuration retrieved")
-
     const {calculateMapHash, zkDig, verifyDig, solidityVerifier, formatProof} = 
         await zkFunctions(width, height)
 
-    console.log("Zero-knowledge created")        
+    console.log("Zero-knowledge created")
 
     assert((width+2)*(height+2) < 512, "map can't exceed 512 bits after adding borders")
     assert(width*height > mineNumber, "can't have more mines than the map size")  
+
+    try {
+        writeFileSync("../contracts/src/verifier.sol", solidityVerifier)
+        const verifierAddress = execSync("./deployVerifier.sh").toString().slice(0,-1)
+        console.log(`Verifier address: ${verifierAddress}`)
+        const tx = await mudSetup.network.worldContract.write.
+            app__setVerifier([verifierAddress])
+
+        await mudSetup.network.waitForTransaction(tx);  
+    } catch (err) {
+        console.error(err)
+        process.exit(-1)
+    }
+
+
 
     const newGame = function() : string {
         const newGame: Game = createGame()

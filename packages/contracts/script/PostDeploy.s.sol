@@ -19,7 +19,7 @@ contract PostDeploy is Script {
     // Start broadcasting transactions from the deployer account
     vm.startBroadcast(deployerPrivateKey);
 
-    IWorld world = IWorld(worldAddress);
+    // IWorld world = IWorld(worldAddress);
     Configuration.set(5, 5, 5);
 
     vm.stopBroadcast();
