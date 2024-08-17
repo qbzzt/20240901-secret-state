@@ -15,7 +15,7 @@ interface IGameSystem {
 
   function app__dig(uint8 x, uint8 y) external;
 
-  function app__digResponse(bytes32 gameId, uint8 x, uint8 y, uint8 bombs) external;
+  function app__digResponse(bytes32 gameId, uint8 x, uint8 y, uint8 bombs, uint256[8] calldata proof) external;
 
   function app__reset() external;
 

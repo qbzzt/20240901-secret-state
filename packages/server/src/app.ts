@@ -31,7 +31,7 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
         return ;
 
     console.log("Configuration retrieved")
-    const {calculateMapHash, zkDig, verifyDig, solidityVerifier, formatProof} = 
+    const {calculateMapHash, zkDig, verifyDig, solidityVerifier} = 
         await zkFunctions(width, height)
 
     console.log("Zero-knowledge created")
@@ -150,13 +150,24 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
         const digResult = zkDig(gamesInProgress[update?.entity].mapWithBorders, 
             Object.values(update.value)[0]?.x, Object.values(update.value)[0]?.y)
 
-//        const formattedResult = formatProof(digResult)[0]
-//        console.log(formattedResult)
+        if (update?.entity != digResult.inputs[2]) {
+            console.log("ERROR: Hash does not match game")
+            console.log(`\tMy gameID: ${update?.entity}`)
+            console.log(`\tHash from zero knowledge: ${digResult.inputs[2]}`)
+
+            return
+        }
 
         const tx = await mudSetup.network.worldContract.write.app__digResponse(
-          [update?.entity, digResult.inputs[0], digResult.inputs[1], 
-            digResult.inputs[digResult.inputs.length-1]]
-        );
+          [digResult.inputs[2], digResult.inputs[0], digResult.inputs[1], 
+            digResult.inputs[3],
+            [
+                digResult.proof.a[0], digResult.proof.a[1], 
+                digResult.proof.b[0][0], digResult.proof.b[0][1],
+                digResult.proof.b[1][0], digResult.proof.b[1][1],
+                digResult.proof.c[0], digResult.proof.c[1],                
+            ]
+          ]);
         await mudSetup.network.waitForTransaction(tx);        
     })   
 

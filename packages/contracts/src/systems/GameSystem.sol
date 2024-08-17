@@ -12,9 +12,30 @@ import {
   PendingDig 
 } from "../codegen/index.sol";
 
+interface IVerifier {
+    struct G1Point {
+      uint X;
+      uint Y;
+    }
+
+    struct G2Point {
+      uint[2] X;
+      uint[2] Y;
+    }
+
+    struct Proof {
+      G1Point a;
+      G2Point b;
+      G1Point c;
+    }
+
+    function verifyTx(
+      Proof memory proof, uint[4] memory input
+    ) external view returns (bool r);
+}
+
 contract GameSystem is System {
-  // Create a new game. For now, this game is "hardwired".
-  // Later we'll interact with the server for it.
+  // Create a new game. 
   function newGame() public {
     // Is there already a game for the user?
     bytes32 gameId = PlayerGame.getGameId(_msgSender());
@@ -47,9 +68,25 @@ contract GameSystem is System {
   // go in the privileged System
   // GOON At this point, this happens without the zero knowledge proof. That part 
   // is to be added later.
-  function digResponse(bytes32 gameId, uint8 x, uint8 y, uint8 bombs) public {
+  function digResponse(bytes32 gameId, uint8 x, uint8 y, uint8 bombs, uint256[8] calldata proof) external {
     require(x == PendingDig.getX(gameId) && y == PendingDig.getY(gameId),
       "Response with wrong coordinates");
+    IVerifier verifier = IVerifier(VerifierAddress.get());
+
+    require(
+      verifier.verifyTx(
+        IVerifier.Proof({
+          a: IVerifier.G1Point({X: proof[0], Y: proof[1]}), 
+          b: IVerifier.G2Point({
+            X: [proof[2], proof[3]], 
+            Y: [proof[4], proof[5]]
+          }), 
+          c: IVerifier.G1Point({X: proof[6], Y: proof[7]})
+        }), 
+        [uint(x), uint(y), uint(gameId), uint(bombs)]
+      ), "Zero knowledge verification fail"
+    );
+
     PendingDig.setWantsDig(gameId, false);
     processDigResult(gameId, x, y, bombs);
   }

@@ -97,12 +97,9 @@ export const zkFunctions = async (width: number, height: number) : Promise<any> 
         \n${zokrates.exportSolidityVerifier(verifierKey)}
         `
 
-    const formatProof = (proof: any) => zokrates.utils.formatProof(proof)
-
     return {
         zkDig,
         calculateMapHash,
         solidityVerifier,
-        formatProof
     }
 }
