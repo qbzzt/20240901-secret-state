@@ -28,8 +28,7 @@ contract GameSystem is System {
     require(!PlayerGame.getLose(_msgSender()), "game over, you lost");    
     bytes32 gameId = PlayerGame.getGameId(_msgSender());
     require(Map.get(gameId, x, y) == 0, "You already dug here");
-    require(!PendingDig.getWantsDig(gameId), "Already dealing with dig request");
-    PendingDig.set(gameId, x, y, true);
+    PendingDig.set(gameId, x, y);
   }  
 
   function reset() public {

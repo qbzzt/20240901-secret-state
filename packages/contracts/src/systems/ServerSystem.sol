@@ -44,8 +44,6 @@ contract ServerSystem is System {
 
   // Called when responding to a dig request. 
   function digResponse(bytes32 gameId, uint8 x, uint8 y, uint8 bombs, uint256[8] calldata proof) external {
-    require(x == PendingDig.getX(gameId) && y == PendingDig.getY(gameId),
-      "Response with wrong coordinates");
     IVerifier verifier = IVerifier(VerifierAddress.get());
 
     require(
@@ -62,7 +60,6 @@ contract ServerSystem is System {
       ), "Zero knowledge verification fail"
     );
 
-    PendingDig.setWantsDig(gameId, false);
     processDigResult(gameId, x, y, bombs);
   }
 

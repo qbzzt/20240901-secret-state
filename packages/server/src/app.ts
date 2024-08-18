@@ -132,10 +132,6 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
 
     mudSetup.network.components.PendingDig.update$.subscribe(async (update) => {
         
-        // Only dig if requested
-        if (!Object.values(update.value)[0]?.wantsDig)
-            return
-
         console.log(`Dig in game ${update?.entity} ` + 
             `at (${Object.values(update.value)[0]?.x},${Object.values(update.value)[0]?.y})`)
 

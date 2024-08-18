@@ -55,9 +55,9 @@ export default defineWorld({
         gameId: "bytes32",
         x: "uint8",
         y: "uint8",
-        wantsDig: "bool",
       },
       key: ["gameId"],
+      type: "offchainTable"
     }
   },
   systems: {
