@@ -34,7 +34,7 @@ interface IVerifier {
     ) external view returns (bool r);
 }
 
-contract PriviligedSystem is System {
+contract ServerSystem is System {
   // Called when responding to a newGame request.
   function newGameResponse(address player, bytes32 gameHash) public {
     PlayerGame.set(player, gameHash, false, false, 0);
