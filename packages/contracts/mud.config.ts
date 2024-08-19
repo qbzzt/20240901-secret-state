@@ -5,8 +5,8 @@ export default defineWorld({
   tables: {
     Configuration: {
       schema: {
-        height: "uint8",
         width: "uint8",
+        height: "uint8",
         numberOfBombs: "uint16",
       },
       key: [],

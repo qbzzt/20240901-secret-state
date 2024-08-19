@@ -17,8 +17,8 @@ import { EncodedLengths, EncodedLengthsLib } from "@latticexyz/store/src/Encoded
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 
 struct ConfigurationData {
-  uint8 height;
   uint8 width;
+  uint8 height;
   uint16 numberOfBombs;
 }
 
@@ -48,8 +48,8 @@ library Configuration {
    */
   function getFieldNames() internal pure returns (string[] memory fieldNames) {
     fieldNames = new string[](3);
-    fieldNames[0] = "height";
-    fieldNames[1] = "width";
+    fieldNames[0] = "width";
+    fieldNames[1] = "height";
     fieldNames[2] = "numberOfBombs";
   }
 
@@ -68,50 +68,12 @@ library Configuration {
   }
 
   /**
-   * @notice Get height.
-   */
-  function getHeight() internal view returns (uint8 height) {
-    bytes32[] memory _keyTuple = new bytes32[](0);
-
-    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
-    return (uint8(bytes1(_blob)));
-  }
-
-  /**
-   * @notice Get height.
-   */
-  function _getHeight() internal view returns (uint8 height) {
-    bytes32[] memory _keyTuple = new bytes32[](0);
-
-    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
-    return (uint8(bytes1(_blob)));
-  }
-
-  /**
-   * @notice Set height.
-   */
-  function setHeight(uint8 height) internal {
-    bytes32[] memory _keyTuple = new bytes32[](0);
-
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((height)), _fieldLayout);
-  }
-
-  /**
-   * @notice Set height.
-   */
-  function _setHeight(uint8 height) internal {
-    bytes32[] memory _keyTuple = new bytes32[](0);
-
-    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((height)), _fieldLayout);
-  }
-
-  /**
    * @notice Get width.
    */
   function getWidth() internal view returns (uint8 width) {
     bytes32[] memory _keyTuple = new bytes32[](0);
 
-    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 1, _fieldLayout);
+    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (uint8(bytes1(_blob)));
   }
 
@@ -121,7 +83,7 @@ library Configuration {
   function _getWidth() internal view returns (uint8 width) {
     bytes32[] memory _keyTuple = new bytes32[](0);
 
-    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 1, _fieldLayout);
+    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (uint8(bytes1(_blob)));
   }
 
@@ -131,7 +93,7 @@ library Configuration {
   function setWidth(uint8 width) internal {
     bytes32[] memory _keyTuple = new bytes32[](0);
 
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 1, abi.encodePacked((width)), _fieldLayout);
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((width)), _fieldLayout);
   }
 
   /**
@@ -140,7 +102,45 @@ library Configuration {
   function _setWidth(uint8 width) internal {
     bytes32[] memory _keyTuple = new bytes32[](0);
 
-    StoreCore.setStaticField(_tableId, _keyTuple, 1, abi.encodePacked((width)), _fieldLayout);
+    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((width)), _fieldLayout);
+  }
+
+  /**
+   * @notice Get height.
+   */
+  function getHeight() internal view returns (uint8 height) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
+
+    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 1, _fieldLayout);
+    return (uint8(bytes1(_blob)));
+  }
+
+  /**
+   * @notice Get height.
+   */
+  function _getHeight() internal view returns (uint8 height) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
+
+    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 1, _fieldLayout);
+    return (uint8(bytes1(_blob)));
+  }
+
+  /**
+   * @notice Set height.
+   */
+  function setHeight(uint8 height) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
+
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 1, abi.encodePacked((height)), _fieldLayout);
+  }
+
+  /**
+   * @notice Set height.
+   */
+  function _setHeight(uint8 height) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
+
+    StoreCore.setStaticField(_tableId, _keyTuple, 1, abi.encodePacked((height)), _fieldLayout);
   }
 
   /**
@@ -212,8 +212,8 @@ library Configuration {
   /**
    * @notice Set the full data using individual values.
    */
-  function set(uint8 height, uint8 width, uint16 numberOfBombs) internal {
-    bytes memory _staticData = encodeStatic(height, width, numberOfBombs);
+  function set(uint8 width, uint8 height, uint16 numberOfBombs) internal {
+    bytes memory _staticData = encodeStatic(width, height, numberOfBombs);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -226,8 +226,8 @@ library Configuration {
   /**
    * @notice Set the full data using individual values.
    */
-  function _set(uint8 height, uint8 width, uint16 numberOfBombs) internal {
-    bytes memory _staticData = encodeStatic(height, width, numberOfBombs);
+  function _set(uint8 width, uint8 height, uint16 numberOfBombs) internal {
+    bytes memory _staticData = encodeStatic(width, height, numberOfBombs);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -241,7 +241,7 @@ library Configuration {
    * @notice Set the full data using the data struct.
    */
   function set(ConfigurationData memory _table) internal {
-    bytes memory _staticData = encodeStatic(_table.height, _table.width, _table.numberOfBombs);
+    bytes memory _staticData = encodeStatic(_table.width, _table.height, _table.numberOfBombs);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -255,7 +255,7 @@ library Configuration {
    * @notice Set the full data using the data struct.
    */
   function _set(ConfigurationData memory _table) internal {
-    bytes memory _staticData = encodeStatic(_table.height, _table.width, _table.numberOfBombs);
+    bytes memory _staticData = encodeStatic(_table.width, _table.height, _table.numberOfBombs);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;
@@ -268,10 +268,10 @@ library Configuration {
   /**
    * @notice Decode the tightly packed blob of static data using this table's field layout.
    */
-  function decodeStatic(bytes memory _blob) internal pure returns (uint8 height, uint8 width, uint16 numberOfBombs) {
-    height = (uint8(Bytes.getBytes1(_blob, 0)));
+  function decodeStatic(bytes memory _blob) internal pure returns (uint8 width, uint8 height, uint16 numberOfBombs) {
+    width = (uint8(Bytes.getBytes1(_blob, 0)));
 
-    width = (uint8(Bytes.getBytes1(_blob, 1)));
+    height = (uint8(Bytes.getBytes1(_blob, 1)));
 
     numberOfBombs = (uint16(Bytes.getBytes2(_blob, 2)));
   }
@@ -287,7 +287,7 @@ library Configuration {
     EncodedLengths,
     bytes memory
   ) internal pure returns (ConfigurationData memory _table) {
-    (_table.height, _table.width, _table.numberOfBombs) = decodeStatic(_staticData);
+    (_table.width, _table.height, _table.numberOfBombs) = decodeStatic(_staticData);
   }
 
   /**
@@ -312,8 +312,8 @@ library Configuration {
    * @notice Tightly pack static (fixed length) data using this table's schema.
    * @return The static data, encoded into a sequence of bytes.
    */
-  function encodeStatic(uint8 height, uint8 width, uint16 numberOfBombs) internal pure returns (bytes memory) {
-    return abi.encodePacked(height, width, numberOfBombs);
+  function encodeStatic(uint8 width, uint8 height, uint16 numberOfBombs) internal pure returns (bytes memory) {
+    return abi.encodePacked(width, height, numberOfBombs);
   }
 
   /**
@@ -323,11 +323,11 @@ library Configuration {
    * @return The dynamic (variable length) data, encoded into a sequence of bytes.
    */
   function encode(
-    uint8 height,
     uint8 width,
+    uint8 height,
     uint16 numberOfBombs
   ) internal pure returns (bytes memory, EncodedLengths, bytes memory) {
-    bytes memory _staticData = encodeStatic(height, width, numberOfBombs);
+    bytes memory _staticData = encodeStatic(width, height, numberOfBombs);
 
     EncodedLengths _encodedLengths;
     bytes memory _dynamicData;

@@ -132,7 +132,7 @@ export const App = () => {
     systemCalls: { dig, reset, newGame },
   } = useMUD();
 
-  const { height, width, numberOfBombs } = useStore(state => {
+  const { width, height, numberOfBombs } = useStore(state => {
     const configuration = Object.values(state.getRecords(tables.Configuration))
     if (configuration.length > 0)
       return Object.values(state.getRecords(tables.Configuration))[0].value
@@ -170,7 +170,7 @@ export const App = () => {
   return (
     <>
       <h2>Minesweeper Game</h2>
-      Configuration: {height} x {width}, {numberOfBombs} <br />
+      Configuration: {width} x {height}, {numberOfBombs} <br />
       Digs left: {digsLeft} <br />
       { gameRecord && gameRecord?.gameId != 0 ? 
           gameRecord.win || gameRecord.lose ?
