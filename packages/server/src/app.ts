@@ -52,7 +52,60 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
         process.exit(-1)
     }
 
+    // Handle requests for new games
+    mudSetup.network.components.PendingGame.update$.subscribe(async (update) => {
 
+        // Only create a new game if wanted
+        if (!Object.values(update.value)[0]?.wantsGame)
+            return
+
+        const gameHash = newGame()
+        const newGameAddress = '0x' + update.entity.slice(-40)
+
+        console.log(`New game ${gameHash} for ${newGameAddress}`)
+
+        const tx = await mudSetup.network.worldContract.write.app__newGameResponse(
+            [newGameAddress, gameHash])
+
+        await mudSetup.network.waitForTransaction(tx);        
+    })
+
+    mudSetup.network.components.PendingDig.update$.subscribe(async (update) => {
+        
+        console.log(`Dig in game ${update?.entity} ` + 
+            `at (${Object.values(update.value)[0]?.x},${Object.values(update.value)[0]?.y})`)
+
+        if (!gamesInProgress[update?.entity]) {
+            console.log("ERROR: Trying a non-existent game")
+            console.log(`\tGame identity: ${update?.entity}`)
+            console.log(`\tGames in progress: ${Object.keys(gamesInProgress)}`)
+
+            return
+        }
+
+        const digResult = zkDig(gamesInProgress[update?.entity].mapWithBorders, 
+            Object.values(update.value)[0]?.x, Object.values(update.value)[0]?.y)
+
+        if (update?.entity != digResult.inputs[2]) {
+            console.log("ERROR: Hash does not match game")
+            console.log(`\tMy gameID: ${update?.entity}`)
+            console.log(`\tHash from zero knowledge: ${digResult.inputs[2]}`)
+
+            return
+        }
+
+        const tx = await mudSetup.network.worldContract.write.app__digResponse(
+          [digResult.inputs[2], digResult.inputs[0], digResult.inputs[1], 
+            digResult.inputs[3],
+            [
+                digResult.proof.a[0], digResult.proof.a[1], 
+                digResult.proof.b[0][0], digResult.proof.b[0][1],
+                digResult.proof.b[1][0], digResult.proof.b[1][1],
+                digResult.proof.c[0], digResult.proof.c[1],                
+            ]
+          ]);
+        await mudSetup.network.waitForTransaction(tx);        
+    })       
 
     const newGame = function() : string {
         const newGame: Game = createGame()
@@ -111,61 +164,6 @@ mudSetup.network.components.Configuration.update$.subscribe(async update => {
 
         return mapWithBorders
     }
-    
-    // Handle requests for new games
-    mudSetup.network.components.PendingGame.update$.subscribe(async (update) => {
-
-        // Only create a new game if wanted
-        if (!Object.values(update.value)[0]?.wantsGame)
-            return
-
-        const gameHash = newGame()
-        const newGameAddress = '0x' + update.entity.slice(-40)
-
-        console.log(`New game ${gameHash} for ${newGameAddress}`)
-
-        const tx = await mudSetup.network.worldContract.write.app__newGameResponse(
-            [newGameAddress, gameHash])
-
-        await mudSetup.network.waitForTransaction(tx);        
-    })
-
-    mudSetup.network.components.PendingDig.update$.subscribe(async (update) => {
-        
-        console.log(`Dig in game ${update?.entity} ` + 
-            `at (${Object.values(update.value)[0]?.x},${Object.values(update.value)[0]?.y})`)
-
-        if (!gamesInProgress[update?.entity]) {
-            console.log("ERROR: Trying a non-existent game")
-            console.log(`\tGame identity: ${update?.entity}`)
-            console.log(`\tGames in progress: ${Object.keys(gamesInProgress)}`)
-
-            return
-        }
-
-        const digResult = zkDig(gamesInProgress[update?.entity].mapWithBorders, 
-            Object.values(update.value)[0]?.x, Object.values(update.value)[0]?.y)
-
-        if (update?.entity != digResult.inputs[2]) {
-            console.log("ERROR: Hash does not match game")
-            console.log(`\tMy gameID: ${update?.entity}`)
-            console.log(`\tHash from zero knowledge: ${digResult.inputs[2]}`)
-
-            return
-        }
-
-        const tx = await mudSetup.network.worldContract.write.app__digResponse(
-          [digResult.inputs[2], digResult.inputs[0], digResult.inputs[1], 
-            digResult.inputs[3],
-            [
-                digResult.proof.a[0], digResult.proof.a[1], 
-                digResult.proof.b[0][0], digResult.proof.b[0][1],
-                digResult.proof.b[1][0], digResult.proof.b[1][1],
-                digResult.proof.c[0], digResult.proof.c[1],                
-            ]
-          ]);
-        await mudSetup.network.waitForTransaction(tx);        
-    })   
 
 })
 
