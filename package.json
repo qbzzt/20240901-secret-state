@@ -21,9 +21,5 @@
     "mprocs": "^0.6.4",
     "rimraf": "^3.0.2",
     "typescript": "5.4.2"
-  },
-  "engines": {
-    "node": "^18",
-    "pnpm": "^8 || ^9"
   }
 }
